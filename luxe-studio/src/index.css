@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --c-bg: #F8F5F0; --c-text: #28221F; --c-muted: #766B64;
+  --c-accent: #A47D59; --c-surface: #FFFFFF; --c-border: #E8E0D8; --c-taupe: #EAE3DA;
+}
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+body { @apply bg-ivory text-ink font-sans antialiased; overflow-x: hidden; }
+h1, h2, h3 { @apply font-serif; }
+:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Marquee */
+@keyframes marquee { to { transform: translateX(-50%); } }
+.marquee { animation: marquee linear infinite; }
+.marquee-wrap:hover .marquee { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .marquee { animation: none !important; } }
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.spin-slow { animation: spin-slow 18s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .spin-slow { animation: none !important; } }
+.text-outline { -webkit-text-stroke: 1px var(--c-text); color: transparent; }
