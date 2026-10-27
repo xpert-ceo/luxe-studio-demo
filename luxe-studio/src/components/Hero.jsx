@@ -1,4 +1,4 @@
-```jsx
+
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowDownRight, ArrowUpRight, Clock3, MapPin } from "lucide-react";
 import { business } from "../config/business";
@@ -168,4 +168,4 @@ export default function Hero() {
     </section>
   );
 }
-```
+
