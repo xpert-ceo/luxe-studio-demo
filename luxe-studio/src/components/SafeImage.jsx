@@ -1,28 +1,81 @@
-import { useRef, useState } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useState } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 
-// Image with shimmer while loading, soft fade-in, optional parallax, and a tidy fallback on error.
-export default function SafeImage({ image, className = "", imgClassName = "", eager = false, parallax = false }) {
+export default function SafeImage({
+  image,
+  className = "",
+  imgClassName = "",
+  eager = false,
+  parallax = false,
+}) {
   const [state, setState] = useState("loading");
-  const ref = useRef(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
-  const move = parallax && !reduce;
+  const reduceMotion = useReducedMotion();
+
+  const imageData =
+    typeof image === "string"
+      ? { src: image, alt: "Salon style and beauty" }
+      : image && typeof image === "object"
+        ? image
+        : {};
+
+  const src =
+    typeof imageData.src === "string" ? imageData.src.trim() : "";
+
+  const alt =
+    typeof imageData.alt === "string" && imageData.alt.trim()
+      ? imageData.alt
+      : "Salon style and beauty";
+
+  const validSource = /^https?:\/\//i.test(src);
+  const shouldParallax = parallax && !reduceMotion && validSource;
+
+  const { scrollYProgress } = useScroll({
+    offset: ["start end", "end start"],
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], ["-5%", "5%"]);
+
+  const showFallback = !validSource || state === "error";
 
   return (
-    <div ref={ref} className={`relative overflow-hidden bg-taupe ${state === "loading" ? "animate-pulse" : ""} ${className}`}>
-      {state === "error" ? (
-        <div role="img" aria-label={image.alt}
-          className="absolute inset-0 bg-gradient-to-br from-taupe to-line flex items-end p-3 text-[10px] tracking-widest uppercase text-muted">
-          Image unavailable
+    <div
+      className={`relative isolate overflow-hidden bg-taupe ${
+        state === "loading" && validSource ? "animate-pulse" : ""
+      } ${className}`}
+    >
+      {showFallback ? (
+        <div
+          role="img"
+          aria-label={`${alt} — image unavailable`}
+          className="absolute inset-0 flex items-end bg-gradient-to-br from-taupe to-line p-3"
+        >
+          <span className="text-[10px] uppercase tracking-[0.16em] text-muted">
+            Image unavailable
+          </span>
         </div>
       ) : (
-        <motion.img src={image.src} alt={image.alt} referrerPolicy="no-referrer"
-          onLoad={() => setState("ok")} onError={() => setState("error")}
-          loading={eager ? "eager" : "lazy"} decoding="async"
-          style={move ? { y, scale: 1.18 } : undefined}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${state === "ok" ? "opacity-100" : "opacity-0"} ${imgClassName}`} />
+        <motion.img
+          src={src}
+          alt={alt}
+          referrerPolicy="no-referrer"
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+          onLoad={() => setState("ok")}
+          onError={() => setState("error")}
+          style={
+            shouldParallax
+              ? { y, scale: 1.12 }
+              : undefined
+          }
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+            state === "ok" ? "opacity-100" : "opacity-0"
+          } ${imgClassName}`}
+        />
       )}
     </div>
   );
